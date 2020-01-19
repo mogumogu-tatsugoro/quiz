@@ -19,7 +19,10 @@
         </b-list-group-item>
       </b-list-group>
 
-      <b-button variant="primary" href="#">Submit</b-button>
+      <b-button
+        variant="primary"
+        @click="submitAnswer"
+      >Submit</b-button>
       <b-button @click="next" variant="success" href="#">Next</b-button>
     </b-jumbotron>
   </div>
@@ -33,10 +36,12 @@ export default {
   props: {
     currentQuestion: Object,
     next: Function,
+    increment: Function,
   },
   data() {
     return {
       selectedIndex: null,
+      correctIndex: null,
       shuffledAnswers: []
     }
   },
@@ -65,8 +70,20 @@ export default {
       this.selectedIndex = index
     },
     shuffleAnswers() {
-      let answers = [...this.currentQuestion.incorrect_answers, this.currentQuestion.correct_answer]
+      const correct_answer = this.currentQuestion.correct_answer
+      let answers = [...this.currentQuestion.incorrect_answers, correct_answer]
       this.shuffledAnswers = _.shuffle(answers)
+      // チュートリアルだと correctIndex がいつの間にか使われてるので追記
+      this.correctIndex = this.shuffledAnswers.indexOf(correct_answer)
+    },
+    submitAnswer() {
+      let isCorrect = false
+
+      if(this.selectedIndex === this.correctIndex) {
+        isCorrect = true;
+      }
+
+      this.increment(isCorrect)
     }
   }
 }
