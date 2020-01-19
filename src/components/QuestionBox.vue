@@ -13,11 +13,7 @@
           v-for="(answer, index) in this.shuffledAnswers"
           :key="index"
           @click="selectAnswer(index)"
-          :class="[
-            !answered && selectedIndex === index ? 'selected' :
-              answered && correctIndex === index ? 'correct' :
-                answered && selectedIndex === index && !(correctIndex === index) ? 'incorrect' : ''
-          ]"
+          :class="answerClass(index)"
         >
           {{ answer }}
         </b-list-group-item>
@@ -86,6 +82,18 @@ export default {
       // チュートリアルだと correctIndex がいつの間にか使われてるので追記
       // これだと shuffledAnswers がまた shuffle されるからダメらしい
       this.correctIndex = this.shuffledAnswers.indexOf(correct_answer)
+    },
+    answerClass(index) {
+      let answerClass = ''
+      if(!this.answered && this.selectedIndex === index) {
+        answerClass = 'selected'
+      } else if (this.answered && this.correctIndex === index) {
+        answerClass = 'correct'
+      } else if (this.answered && this.selectedIndex === index && !(this.correctIndex === index)){
+        answerClass = 'incorrect'
+      }
+
+      return answerClass
     },
     submitAnswer() {
       let isCorrect = false
