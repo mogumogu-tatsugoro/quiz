@@ -13,16 +13,24 @@
           v-for="(answer, index) in this.shuffledAnswers"
           :key="index"
           @click="selectAnswer(index)"
-          :class="[selectedIndex === index ? 'selected' : '']"
+          :class="[
+            !answered && selectedIndex === index ? 'selected' :
+              answered && correctIndex === index ? 'correct' :
+                answered && selectedIndex === index && !(correctIndex === index) ? 'incorrect' : ''
+          ]"
         >
           {{ answer }}
         </b-list-group-item>
       </b-list-group>
 
+      <!-- :disabpled で !selectedIndex しようとしたけど 0 でも falsy なのでダメ -->
       <b-button
         variant="primary"
         @click="submitAnswer"
-      >Submit</b-button>
+        :disabled="selectedIndex === null || answered"
+      >
+        Submit
+      </b-button>
       <b-button @click="next" variant="success" href="#">Next</b-button>
     </b-jumbotron>
   </div>
@@ -42,7 +50,8 @@ export default {
     return {
       selectedIndex: null,
       correctIndex: null,
-      shuffledAnswers: []
+      shuffledAnswers: [],
+      answered: false
     }
   },
   computed: {
@@ -61,6 +70,7 @@ export default {
       // handler に処理を記述
       handler() {
         this.selectedIndex = null
+        this.answered = false
         this.shuffleAnswers()
       }
     }
@@ -74,6 +84,7 @@ export default {
       let answers = [...this.currentQuestion.incorrect_answers, correct_answer]
       this.shuffledAnswers = _.shuffle(answers)
       // チュートリアルだと correctIndex がいつの間にか使われてるので追記
+      // これだと shuffledAnswers がまた shuffle されるからダメらしい
       this.correctIndex = this.shuffledAnswers.indexOf(correct_answer)
     },
     submitAnswer() {
@@ -82,7 +93,7 @@ export default {
       if(this.selectedIndex === this.correctIndex) {
         isCorrect = true;
       }
-
+      this.answered = true
       this.increment(isCorrect)
     }
   }
